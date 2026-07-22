@@ -169,10 +169,6 @@ For questions or issues, please open a GitHub Issue or contact the development t
 
 ---
 
-<div align="center">
-
-**Developed with ❤️ for professional job placement and candidate grooming**
-
 *Last Updated: July 2026*
 
-</div>
+
