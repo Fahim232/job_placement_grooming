@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  web:
+    image: php:8.1-apache
+    container_name: job_app_php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:cached
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER:-appuser}
+      DB_PASS: ${DB_PASS:-app_password}
+      DB_NAME: ${DB_NAME:-projects}
+
+  db:
+    image: mysql:8.0
+    container_name: job_app_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-projects}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password_placeholder}
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app_password}
+    volumes:
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: job_app_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password_placeholder}
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data: {}

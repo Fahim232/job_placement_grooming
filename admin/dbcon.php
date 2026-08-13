@@ -1,18 +1,17 @@
 <?php
 /**
  * Database Connection Module
- * 
- * Establishes a global MySQLi connection to the database.
- * Prevents multiple redundant database connection attempts if $con is already set.
+ * Modified to read credentials from environment variables for containerized deployments.
+ * Falls back to sensible defaults for local development.
  */
 
 // Check if a database connection handle ($con) is already active
 if (!isset($con)) {
-    // Database credentials configuration
-    $host     = 'localhost';
-    $user     = 'root';
-    $password = '';         // Default XAMPP MySQL password (empty)
-    $database = 'projects'; // Target application database name
+    // Read configuration from environment variables (set these in your Docker Compose or environment)
+    $host     = getenv('DB_HOST') !== false ? getenv('DB_HOST') : 'localhost';
+    $user     = getenv('DB_USER') !== false ? getenv('DB_USER') : 'root';
+    $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
+    $database = getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'projects';
 
     // Attempt establishing connection to MySQL server
     $con = @mysqli_connect($host, $user, $password, $database);
