@@ -1,38 +1,36 @@
 <?php
 /**
- * Database Connection Module
- * 
- * Establishes a global MySQLi connection to the database.
- * Prevents multiple redundant database connection attempts if $con is already set.
+ * admin/dbcon.php
+ * Environment-variable-based DB connection with safe defaults for local/docker development.
  */
 
-// Check if a database connection handle ($con) is already active
 if (!isset($con)) {
-    // Database credentials configuration
-    $host     = 'localhost';
-    $user     = 'root';
-    $password = '';         // Default XAMPP MySQL password (empty)
-    $database = 'projects'; // Target application database name
+    // Read from environment variables (preferred). Set these in your hosting panel or CI environment.
+    $host     = getenv('DB_HOST') !== false ? getenv('DB_HOST') : 'db';
+    $user     = getenv('DB_USER') !== false ? getenv('DB_USER') : 'user';
+    $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'password';
+    $database = getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'projects';
 
-    // Attempt establishing connection to MySQL server
+    // Try to connect (suppress warnings, handle error below)
     $con = @mysqli_connect($host, $user, $password, $database);
 
-    // Validate database connection success
     if (!$con) {
-        // Log connection failure to error log for server debugging
+        // Log the error to server logs
         error_log("Database Connection Failure: " . mysqli_connect_error());
 
-        // If request is an AJAX/API JSON call, return structured JSON error payload
+        // If AJAX/XHR, return JSON
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Database Connection Failed']);
             exit();
         } else {
-            // Render user-friendly alert for standard web browser views
-            echo '<script>alert("Database Connection Unsuccessful! Please check database server.");</script>';
+            // Friendly alert for browser
+            echo '<script>alert("Database Connection Unsuccessful! Please check database credentials.");</script>';
+            // Do not exit to allow pages to show a friendly message, but you can uncomment exit() for stricter behavior
+            // exit();
         }
     } else {
-        // Set charset to utf8mb4 for full UTF-8 support (emojis, special characters) and optimized performance
+        // Set proper charset
         mysqli_set_charset($con, "utf8mb4");
     }
 }
