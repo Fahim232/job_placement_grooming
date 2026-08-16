@@ -106,6 +106,31 @@ chmod 755 uploads/company_logos/
 http://localhost/Job-portal-and-grooming/index.php
 ```
 
+### Deploy on Replit (Cloud)
+
+This project can be run on Replit as a quick cloud demo, but Replit does not provide a persistent MySQL server. Use this flow to run on Replit:
+
+1. Create or obtain a remote MySQL database (examples: remotemysql.com, db4free.net, PlanetScale). Note DB_HOST, DB_NAME, DB_USER, DB_PASS and the phpMyAdmin URL if provided by the host.
+2. Import SQL files into that remote DB (order: `database.sql`, `job_categories_v2.sql`, `ai_db.sql`). Use the provider's phpMyAdmin or CLI to import.
+3. Import this GitHub repo into Replit:
+   - Go to https://replit.com/ → Create → Import from GitHub → paste `https://github.com/Fahim232/job_placement_grooming`.
+4. In the Replit project, open Secrets (Environment) and add:
+   - `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
+   Replit will supply these env vars to the app; the project already uses env-based DB config in `admin/dbcon.php`.
+5. Run the Replit project. The provided `.replit` file starts PHP builtin server:
+
+```
+php -S 0.0.0.0:3000 -t .
+```
+
+6. Open the public Replit URL (https://<project>.<username>.repl.co) and confirm the site loads.
+
+Notes:
+- Replit's filesystem on free tier is ephemeral — uploaded files may be lost on restarts. For production uploads use external storage (S3 or similar).
+- If your remote DB provider restricts remote connections, enable remote access (or use a provider that allows external connections).
+
+For a more detailed Replit setup guide, see `REPLIT_SETUP.md` in this repo.
+
 ## Default Credentials
 
 ### Admin
